@@ -1,0 +1,130 @@
+{% extends "students/base.html" %}
+
+{% block title %}Teachers{% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+    <li class="breadcrumb-item active">Teachers</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+    <h4>Teachers</h4>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+        <i class="bi bi-plus-circle"></i> Add Teacher
+    </button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for teacher in teachers %}
+                <tr>
+                    <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
+                    <td>{{ teacher.department }}</td>
+                    <td>{{ teacher.email }}</td>
+                    <td class="text-center">
+                        <a href="#" class="text-primary me-3"
+                           data-bs-toggle="modal"
+                           data-bs-target="#editTeacherModal"
+                           data-id="{{ teacher.id }}"
+                           data-fname="{{ teacher.first_name }}"
+                           data-lname="{{ teacher.last_name }}"
+                           data-email="{{ teacher.email }}"
+                           data-phone="{{ teacher.phone }}"
+                           data-department="{{ teacher.department }}">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="#"
+                        class="text-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-delete-url="{% url 'teacher_delete' teacher.id %}"
+                        data-object-name="{{ teacher.first_name }} {{ teacher.last_name }}">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-4">No teachers found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ADD TEACHER MODAL -->
+<div class="modal fade" id="addTeacherModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form method="post" action="{% url 'teacher_create' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header bg-success text-white">
+                <h5>Add Teacher</h5>
+                <button type="reset" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body row g-3">
+                <div class="col-md-6">{{ form.first_name.label_tag }}{{ form.first_name }}</div>
+                <div class="col-md-6">{{ form.last_name.label_tag }}{{ form.last_name }}</div>
+                <div class="col-md-6">{{ form.email.label_tag }}{{ form.email }}</div>
+                <div class="col-md-6">{{ form.phone.label_tag }}{{ form.phone }}</div>
+                <div class="col-md-12">{{ form.department.label_tag }}{{ form.department }}</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="reset" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-success">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT TEACHER MODAL -->
+<div class="modal fade" id="editTeacherModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form method="post" id="editTeacherForm" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header bg-success text-white">
+                <h5>Edit Teacher</h5>
+                <button type="reset" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body row g-3">
+                <div class="col-md-6"><input class="form-control" name="first_name" id="tFname"></div>
+                <div class="col-md-6"><input class="form-control" name="last_name" id="tLname"></div>
+                <div class="col-md-6"><input class="form-control" name="email" id="tEmail"></div>
+                <div class="col-md-6"><input class="form-control" name="phone" id="tPhone"></div>
+                <div class="col-md-12"><input class="form-control" name="department" id="tDept"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="reset" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-success">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('editTeacherModal').addEventListener('show.bs.modal', e => {
+    const b = e.relatedTarget;
+    editTeacherForm.action = `/teachers/edit/${b.dataset.id}/`;
+    tFname.value = b.dataset.fname;
+    tLname.value = b.dataset.lname;
+    tEmail.value = b.dataset.email;
+    tPhone.value = b.dataset.phone || '';
+    tDept.value = b.dataset.department;
+});
+</script>
+
+{% endblock %}

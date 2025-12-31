@@ -1,0 +1,4 @@
+school_management/__pycache__/
+school_management/migrations/__pycache__/
+school_management/settings.py
+.env
